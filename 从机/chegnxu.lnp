@@ -1,0 +1,6 @@
+"STARTUP.obj",
+"LCD1602.obj",
+"Delay.obj",
+"Slave1.obj" 
+TO "chegnxu" 
+RAMSIZE(256) 
