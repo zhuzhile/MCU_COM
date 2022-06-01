@@ -1,0 +1,6 @@
+"STARTUP.obj",
+"LCD1602.obj",
+"Delay.obj",
+"Slave2.obj" 
+TO "Slave2" 
+RAMSIZE(256) 

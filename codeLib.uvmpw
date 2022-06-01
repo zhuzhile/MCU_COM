@@ -8,18 +8,18 @@
   <WorkspaceName>WorkSpace</WorkspaceName>
 
   <project>
-    <PathAndName>.\从机\chegnxu.uvproj</PathAndName>
+    <PathAndName>.\MASTER_CODELIB\COM_SERV_MASTER.uvproj</PathAndName>
     <NodeIsActive>1</NodeIsActive>
     <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
   <project>
-    <PathAndName>.\主机\chegnxu.uvproj</PathAndName>
+    <PathAndName>.\SLAVE1_CODELIB\COM_SERV_SLAVE1.uvproj</PathAndName>
     <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
   <project>
-    <PathAndName>.\从机2\chegnxu.uvproj</PathAndName>
+    <PathAndName>.\SLAVE2_CODELIB\COM_SERV_SLAVE2.uvproj</PathAndName>
     <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 

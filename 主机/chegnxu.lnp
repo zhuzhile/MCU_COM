@@ -1,7 +1,0 @@
-"STARTUP.obj",
-"Master.obj",
-"KeyScan.obj",
-"Delay.obj",
-"LCD1602.obj" 
-TO "chegnxu" 
-RAMSIZE(256) 
