@@ -12,8 +12,8 @@ sbit RS485_TR=P3^2;
 
 #define TXEN RS485_TR=1; //发送使能
 #define RXEN RS485_TR=0; //接收使能
-#define OSC 12000000
-#define BAUDRATE 4800
+#define OSC 120000000
+#define BAUDRATE 9600
 
 
 bit R_done = 0;  // 判断接收是否完成
@@ -45,6 +45,7 @@ void send_stop_signal();
 uint create_stop_check(); // 创造停止校验位
 
 void main(){
+	LED = 0;
 	serial_init();
 	LCD_init();
 	
@@ -68,7 +69,7 @@ void mock_data(){ // 模拟发送数据
 	}
 	check = T_buf[0];
 	for(i = 1; i < len + 3; i++){
-			check ^= T_buf[i];
+			check += T_buf[i];
 	}
 	
 	T_buf[3 + len] = check;
@@ -86,41 +87,49 @@ void show_test_data(uchar index,uchar TR_data){
 		  show_string(2, 9, "_T_"); //发送数据标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 		case 1:
 			show_string(2, 9, "_R_"); //接收数据标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 		case 2:
 			show_string(2, 9, "TD_"); //发送数据完成标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 		case 3:
 			show_string(2, 9, "RD_"); //接收数据完成标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 		case 4:
 			show_string(2, 9, "RA_"); //接收地址标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
   		break;
 		case 5:
 			show_string(2, 9, "TA_"); //发送地址标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 		case 6:
 			show_string(2, 9, "RTA"); //重新发送地址标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 		case 7:
 			show_string(2, 9, "RT_"); //重新发送数据标志
 			delay(1000);
 			show_num(2, 9, TR_data, 3);
+			delay(1000);
 			break;
 	}
 }
@@ -134,23 +143,17 @@ void send_addr(){
 	SBUF = T_addr;
 	while(!TI);
 	TI = 0;
-	index = send_addr_counter == 0 ? 5 : 6;
-	show_test_data(index, T_addr); // 测试代码
-	delay(1000);
-	
 	RXEN;
 	RI = 0;
-	
-	delay(2000);
+	index = send_addr_counter == 0 ? 5 : 6;
+	show_test_data(index, T_addr); // 测试代码
 	
 	time_count = 0;
 	timer0_init();
 	while(time_count < 7); //等待7ms过后
-	time_count = 0;
 	
 	
   if(R_addr != T_addr){
-//		delay(100);  //与从机同步
 		send_addr_counter ++;
 		send_addr();
 	}
@@ -176,13 +179,11 @@ void send_data(){
 		while(!T_done);	
 		T_done = 0;
 		
-	
 		RXEN;           //开始接收数据
 		RI = 0;
-		R_done = 0;
 		RPtr = 0;
 	
-		while(!R_done );
+		while(!R_done);
 		R_done = 0;		
 }
 
@@ -219,6 +220,8 @@ void handle_key(){
 			send_stop_signal(); // 开始发送长度为0数据，表示发送终止
 			while(!T_done);
 			T_done = 0;
+			R_addr = 0x00;
+			TXEN;
 			break;
 	}
 }
@@ -227,7 +230,7 @@ uint create_stop_check(){
 	uint i = 0, stop_check = T_buf[0];
 	
 	for( i = 1; i < 3; i++){
-		stop_check ^= T_buf[i];
+		stop_check += T_buf[i];
 	}
 	
 	return stop_check;
@@ -294,17 +297,14 @@ void comISR()interrupt 4{ // 通信串口中断服务
 			SBUF = T_buf[TPtr++];
 			
 			index = Succ ? 0 : 7;
-			show_test_data(index, T_buf[TPtr - 1]); //测试代码
-			delay(1000);
+			
+  		show_test_data(index, T_buf[TPtr - 1]); //测试代码
 			
 			if(TPtr >=  T_buf[2] + 4){
-				
+				RXEN;
 				show_test_data(2, TPtr); //测试代码
-				delay(1000);
-		
-	//			delay(100); //保持主从同步
-				
 				T_done = 1;
+				
 				TPtr = 0;
 				Succ = 1;
 				send_addr_counter = 0;
@@ -315,18 +315,16 @@ void comISR()interrupt 4{ // 通信串口中断服务
 	if(RI == 1){  
 		RI = 0;
 	  if(RB8 == 0){
-		  R_buf[RPtr++] = SBUF;
+		  R_buf[RPtr ++] = SBUF;
 			
 			show_test_data(1, R_buf[RPtr - 1]); //测试代码
-			delay(1000);
 
 		  if( RPtr >= 3 + R_buf[1]){ //从机地址+数据长度+数据+校验和
 				
  	  			show_test_data(3, RPtr); //测试代码
-					delay(1000);
-				
+					
+				  Succ = (R_buf[1] == 0 ? 0 : 1);
 					R_done = 1;
-				  Succ = R_buf[1] == 0 ? 0 : 1;
 		  }
 		}
 		
@@ -339,5 +337,9 @@ void comISR()interrupt 4{ // 通信串口中断服务
 
 void timer0ISR() interrupt 1{ // 定时器0中断服务timer	
 	time_count ++;
-	timer0_init();
+	if(time_count < 7){
+		TH0 = (65535 - 1000)/256;
+		TL0 = (65535 - 1000)%256;
+	}
 }
+

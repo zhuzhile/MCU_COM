@@ -4,8 +4,8 @@
 
 #define uchar unsigned char 
 #define uint unsigned int
-#define OSC 12000000
-#define BAUDRATE 4800
+#define OSC 120000000
+#define BAUDRATE 9600
 
 uchar R_buf[10],T_buf[10];		//接收数据缓存
 uint RPtr, TPtr; // 接收与发送指针
@@ -57,31 +57,37 @@ void show_test_data(uchar index,uchar TR_data){
 		  show_string(2,1, "_T_");
 			delay(1000);
 			show_num(2, 1, TR_data, 3);
+			delay(1000);
 			break;
 		case 1:
 			show_string(2,1, "_R_");
 			delay(1000);
 			show_num(2, 1, TR_data, 3);
+			delay(1000);
 			break;
 		case 2:
-			show_string(2,1, "TD_");
+			show_string(2, 1, "TD_");
 			delay(1000);
 			show_num(2, 1, TR_data, 3);
+			delay(1000);
 			break;
 		case 3:
-			show_string(2,1, "RD_");
+			show_string(2, 1, "RD_");
 			delay(1000);
 			show_num(2, 1, TR_data, 3);
+			delay(1000);
 			break;
 		case 4:
-			show_string(2,1, "RA_");
+			show_string(2, 1, "RA_");
 			delay(1000);
 			show_num(2, 1, TR_data, 3);
+			delay(1000);
   		break;
 		case 5:
-			show_string(2,1, "TA_");
+			show_string(2, 1, "TA_");
 			delay(1000);
 			show_num(2, 1, TR_data, 3);
+			delay(1000);
 			break;
 	}
 }
@@ -103,10 +109,10 @@ void mock_data(){
 	}
 	
 	check = T_buf[0];
-	len_data = T_buf[1] == 0 ? 2: T_buf[1] + 3;
+	len_data = T_buf[1] == 0 ? 2: T_buf[1] + 2;
 	
 	for( i = 1 ; i < len_data; i++){
-		check ^= T_buf[i];
+		check += T_buf[i];
 	}
 	
 	T_buf[i] = check;
@@ -117,7 +123,6 @@ void mock_data(){
 void send_addr(uchar slave_addr){
 	 TI = 0;
 	 TB8 = 1;
-	 LED=~LED;
 	 TXEN;
 	 SBUF = slave_addr;
 	 while(!TI);
@@ -151,29 +156,22 @@ void recv_data(){
      
 		R_check = R_buf[0];
 		for(i = 1; i < len + 3;i++){
-			R_check ^= R_buf[i];
+			R_check += R_buf[i];
 		}
 	  Succ = ~Succ; //用于测试
 	 // Succ = (R_check == R_buf[len + 3] ? 1 : 0);
-		
-	//	timer0_init(); // 测试执行mock_data,多长时间；测试表明将近100ms
+
 		mock_data();  // 根据接收数据，模拟数据
-		
-	//	show_test_data(25); //测试代码
-	//	delay(1000);        
-	//	show_test_data(time_count);
-	//	delay(1000);
-		
-	  delay(1000); //同步主机
 		send_data();  //校验后向主机发送数据
 }
 
 
 
 void main(){
-	uint i = 0;
+	LED = 0;
 	serial_init();  // 串口初始化
 	LCD_init();     // LCD显示初始化
+
 	
 	write_command(0x80); // 光标位置
 	write_data('R');
@@ -183,14 +181,13 @@ void main(){
 		while(!RI); // 等到触发接收中断时跳出
 		
 		show_test_data(4, A_acc); //异常测试代码
-		delay(1000);
 		
-	  if(R_addr == slave_addr && A_acc){ // 确定地址,A_acc 用于模仿超过七毫秒没有接收到数据		
+	  if(R_addr == slave_addr && A_acc){ // 确定地址,A_acc 用于模仿超过七毫秒没有接收到数据
 			show_test_data(5, A_acc);
 			send_addr(slave_addr);
 			SM2 = 0;
 		}else {
-			delay(10);
+			delay(10); //延迟10ms没有发送数据
 			A_acc = ~A_acc;
 			continue;
 		}				
@@ -210,6 +207,7 @@ void main(){
 		
 		while(!R_done); //通信结束
 		SM2 = 1;
+		RPtr = 0;
 		Succ = 0;
 	}
 }
@@ -219,16 +217,14 @@ void comISR() interrupt 4 { //串口通信中断服务
 	if(RI == 1){  
 		RI = 0;
 		if(RB8 == 0){
-			
+			delay(1);
 		  R_buf[RPtr++] = SBUF;
-                           
+                 
 			show_test_data(1, R_buf[RPtr - 1]); //测试代码
-			delay(1000);
 			
 		  if( RPtr >= 4 + R_buf[2]){ //主机地址+从机地址+数据长度+数据+校验和
 			  
 				show_test_data(3, RPtr);  //测试代码
-				delay(1000);
 				
 				R_done = 1;
 				len = R_buf[2];
@@ -249,13 +245,10 @@ void comISR() interrupt 4 { //串口通信中断服务
 			SBUF = T_buf[TPtr++];
 			
 			show_test_data(0, T_buf[TPtr - 1]); //测试代码
-			delay(1000);
 			
 			if(TPtr >= T_buf[1] + 3){
 				
 					show_test_data(2, TPtr); //测试代码
-					delay(1000);
-				
 					T_done = 1;
 					TPtr = 0;
 			}

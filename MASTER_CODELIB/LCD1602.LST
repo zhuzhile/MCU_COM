@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   LCD1602                                                           06/02/2022 00:12:33 PAGE 1   
+C51 COMPILER V9.60.0.0   LCD1602                                                           06/06/2022 07:43:09 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LCD1602
@@ -62,7 +62,7 @@ line level    source
   52   1      }
   53          
   54          
-C51 COMPILER V9.60.0.0   LCD1602                                                           06/02/2022 00:12:33 PAGE 2   
+C51 COMPILER V9.60.0.0   LCD1602                                                           06/06/2022 07:43:09 PAGE 2   
 
   55          
   56          /** * @brief ‘⁄LCD1602÷∏∂®Œª÷√…œœ‘ æ“ª∏ˆ◊÷∑˚ * @param Line ––Œª÷√£¨∑∂Œß£∫1~2 * @param Column ¡–Œª÷√£¨∑∂Œß£
@@ -126,7 +126,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    257    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.0.0   LCD1602                                                           06/02/2022 00:12:33 PAGE 3   
+C51 COMPILER V9.60.0.0   LCD1602                                                           06/06/2022 07:43:09 PAGE 3   
 
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----      17

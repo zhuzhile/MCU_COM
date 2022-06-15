@@ -1,6 +1,6 @@
 "STARTUP.obj",
-"LCD1602.obj",
 "Delay.obj",
+"LCD1602.obj",
 "Slave2.obj" 
 TO "Slave2" 
-RAMSIZE(256) 
+PRINT(".\Listings\Slave2.m51")
