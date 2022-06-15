@@ -4,7 +4,7 @@
 
 开发语言：C51
 
-文档链接：https://www.yuque.com/bemount/qox9wu/eyfoi8/edit
+文档链接：https://www.yuque.com/g/bemount/qox9wu/collaborator/join?token=CLyUbTTv2YcwoD9x# (可阅读)
 
 文档内容概览
 
