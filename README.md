@@ -2,6 +2,8 @@
 
 开发工具：Keil5，Proteus， Altium
 
+单片机型号：STC89C52
+
 开发语言：C51
 
 文档链接：https://www.yuque.com/docs/share/29a2f5a3-8533-4fe9-81b0-f587883a25c4?# 《单片机多机通信协议设计与实现——基于485总线》
